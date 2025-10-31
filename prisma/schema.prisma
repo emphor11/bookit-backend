@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Experience {
+  id               String     @id @default(uuid())
+  title            String
+  shortDescription String?
+  longDescription  String?
+  priceCents       Int
+  durationMinutes  Int?
+  coverImage       String?
+  createdAt        DateTime   @default(now())
+
+  slots     Slot[]
+  bookings  Booking[]
+}
+
+model Slot {
+  id            String      @id @default(uuid())
+  experienceId  String
+  slotDate      DateTime
+  slotTime      String
+  capacity      Int
+  bookedCount   Int          @default(0)
+
+  experience    Experience   @relation(fields: [experienceId], references: [id])
+  bookings      Booking[]
+
+  @@unique([experienceId, slotDate, slotTime])
+}
+
+model Booking {
+  id              String     @id @default(uuid())
+  experienceId    String
+  slotId          String
+  customerName    String
+  customerEmail   String
+  seats           Int
+  promoCode       String?
+  finalPriceCents Int
+  status          String     @default("CONFIRMED")
+  createdAt       DateTime   @default(now())
+
+  experience  Experience @relation(fields: [experienceId], references: [id])
+  slot        Slot       @relation(fields: [slotId], references: [id])
+}
+
+model Promo {
+  code       String   @id
+  type       String   // 'percent' or 'flat'
+  value      Int
+  validUntil DateTime?
+}
