@@ -58,8 +58,8 @@ router.post("/", async (req, res) => {
           customerName: name,
           customerEmail: email,
           seats,
+          finalPriceCents: finalPrice,
           ...(promoCode ? { promoCode } : { promoCode: undefined }),
-          finalPriceCents: finalPrice
         }
       });
 
